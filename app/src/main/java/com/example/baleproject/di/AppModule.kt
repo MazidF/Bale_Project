@@ -13,6 +13,7 @@ import com.example.baleproject.data.repository.IssueRepository
 import com.example.baleproject.data.repository.LabelRepository
 import com.example.baleproject.data.repository.UserRepository
 import com.example.baleproject.di.qualifiers.IO
+import com.example.baleproject.domain.UseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -86,6 +87,22 @@ class AppModule {
     ): LabelRepository {
         return LabelRepository(
             dataSource = dataSource,
+            dispatcher = dispatcher,
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideUseCase(
+        userRepository: UserRepository,
+        issueRepository: IssueRepository,
+        labelRepository: LabelRepository,
+        @IO dispatcher: CoroutineDispatcher,
+    ): UseCase {
+        return UseCase(
+            userRepository = userRepository,
+            labelRepository = labelRepository,
+            issueRepository = issueRepository,
             dispatcher = dispatcher,
         )
     }
