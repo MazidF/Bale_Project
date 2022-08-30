@@ -1,6 +1,8 @@
 package com.example.baleproject.di
 
 import com.example.baleproject.data.model.User
+import com.example.baleproject.data.remote.api.IssueApi
+import com.example.baleproject.data.remote.api.LabelApi
 import com.example.baleproject.data.remote.api.UserApi
 import com.example.baleproject.data.remote.api.deserializer.UserDeserializer
 import com.example.baleproject.di.qualifiers.Authorizer
@@ -89,5 +91,21 @@ class NetworkModule {
         retrofit: Retrofit,
     ): UserApi {
         return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLabelApi(
+        retrofit: Retrofit,
+    ): LabelApi {
+        return retrofit.create(LabelApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideIssueApi(
+        retrofit: Retrofit,
+    ): IssueApi {
+        return retrofit.create(IssueApi::class.java)
     }
 }
