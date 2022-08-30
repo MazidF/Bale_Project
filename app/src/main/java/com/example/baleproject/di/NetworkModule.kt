@@ -1,5 +1,8 @@
 package com.example.baleproject.di
 
+import com.example.baleproject.data.model.User
+import com.example.baleproject.data.remote.api.UserApi
+import com.example.baleproject.data.remote.api.deserializer.UserDeserializer
 import com.example.baleproject.di.qualifiers.Authorizer
 import com.example.baleproject.di.qualifiers.Logger
 import com.example.baleproject.utils.SERVER_BASE_URL
@@ -24,6 +27,7 @@ class NetworkModule {
     @Singleton
     fun provideGson(): Gson {
         return GsonBuilder()
+            .registerTypeAdapter(User::class.java, UserDeserializer)
             .create()
     }
 
@@ -77,5 +81,13 @@ class NetworkModule {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(client)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserApi(
+        retrofit: Retrofit,
+    ): UserApi {
+        return retrofit.create(UserApi::class.java)
     }
 }
