@@ -69,6 +69,7 @@ dependencies {
     // Hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
 
     // Retrofit
     def retrofit_version = "2.9.0"
@@ -86,5 +87,11 @@ dependencies {
     // Navigation
     def nav_version = "2.5.1"
     implementation "androidx.navigation:navigation-compose:$nav_version"
+
+    // View Pager
+    implementation "com.google.accompanist:accompanist-pager:0.23.1"
+
+    // Paging3
+    implementation "androidx.paging:paging-compose:1.0.0-alpha15"
 
 }
