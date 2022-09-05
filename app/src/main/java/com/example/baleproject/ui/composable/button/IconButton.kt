@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 fun IconButton(
     @DrawableRes id: Int,
     onClick: () -> Unit = {},
+    colorFilter: Color = Color.Gray,
 ) {
     androidx.compose.material.IconButton(
         onClick = onClick,
@@ -26,7 +27,7 @@ fun IconButton(
         Image(
             painter = painterResource(id = id),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(Color.Gray),
+            colorFilter = ColorFilter.tint(colorFilter),
         )
     }
 }

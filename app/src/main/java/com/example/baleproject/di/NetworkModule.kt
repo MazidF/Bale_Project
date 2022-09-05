@@ -1,6 +1,5 @@
 package com.example.baleproject.di
 
-import android.content.Context
 import com.example.baleproject.data.model.Issue
 import com.example.baleproject.data.model.User
 import com.example.baleproject.data.model.UserInfo
@@ -10,18 +9,13 @@ import com.example.baleproject.data.remote.api.UserApi
 import com.example.baleproject.data.remote.api.deserializer.IssueDeserializer
 import com.example.baleproject.data.remote.api.deserializer.UserDeserializer
 import com.example.baleproject.data.remote.api.deserializer.UserInfoDeserializer
-import com.example.baleproject.di.qualifiers.AuthenticationToken
-import com.example.baleproject.di.qualifiers.Authorizer
 import com.example.baleproject.di.qualifiers.Logger
-import com.example.baleproject.utils.ACCESS_TOKEN_KEY
 import com.example.baleproject.utils.SERVER_BASE_URL
-import com.example.baleproject.utils.getAccessToken
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -33,15 +27,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-
-    @Provides
-    @Singleton
-    @AuthenticationToken
-    fun provideAccessToken(
-        @ApplicationContext context: Context,
-    ): String? {
-        return getAccessToken(context)
-    }
 
     @Provides
     @Singleton

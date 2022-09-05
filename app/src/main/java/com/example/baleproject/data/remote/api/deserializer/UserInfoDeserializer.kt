@@ -17,7 +17,7 @@ object UserInfoDeserializer : JsonDeserializer<UserInfo> {
             name = this["name"].asString,
             email = this["email"].asString,
             verified = this["verified"].asBoolean,
-            accessToken = "",
+            cookie = "",
         )
     }
 }

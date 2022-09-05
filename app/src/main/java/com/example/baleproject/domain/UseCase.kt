@@ -10,8 +10,9 @@ import com.example.baleproject.data.repository.UserRepository
 import com.example.baleproject.data.result.Result
 import com.example.baleproject.domain.paging.ItemPagingSource
 import com.example.baleproject.ui.model.IssueItem
-import com.example.baleproject.utils.*
+import com.example.baleproject.utils.getEmailAndPassword
 import com.example.baleproject.utils.helpers.ConnectionHelper
+import com.example.baleproject.utils.toIssueItem
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -126,6 +127,15 @@ class UseCase(
         }
     }
 
+    suspend fun autoLogin(): Result<Unit> {
+        val (email, password) = getEmailAndPassword(context) ?: return Result.success(Unit)
+        val user = LoginUser(
+            email = email,
+            password = password,
+        )
+        return userRepository.login(user).map {}
+    }
+
     private fun saveUserInfo(result: Result<UserInfo>) {
         if (result is Result.Success) {
             saveUserInfo(result.data())
@@ -153,7 +163,7 @@ class UseCase(
             labelIds = labelIds,
         )
         return safeApiCall {
-            issueRepository.createIssue(userInfo!!.accessToken, rawIssue)
+            issueRepository.createIssue(userInfo!!.cookie, rawIssue)
         }
     }
 

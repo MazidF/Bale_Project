@@ -42,7 +42,7 @@ class RemoteUserDataSource(
         return response.asResult {
             val index = accessToken.indexOf("; Path=/;")
             this.copy(
-                accessToken = accessToken.substring(0, index).removePrefix("access_token=")
+                cookie = accessToken.substring(0, index)
             )
             /*UserInfo(
                 id = id,

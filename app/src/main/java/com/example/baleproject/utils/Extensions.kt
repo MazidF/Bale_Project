@@ -28,27 +28,21 @@ fun sharedPreferences(context: Context): SharedPreferences {
     return context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
 }
 
-fun getAccessToken(context: Context): String? {
+fun getEmailAndPassword(context: Context): Pair<String, String>? {
     val sharedPreferences = sharedPreferences(context)
-    return sharedPreferences.getString(ACCESS_TOKEN_KEY, null)
-}
-
-fun updateAccessToken(context: Context, token: String) {
-    val sharedPreferences = sharedPreferences(context)
-    sharedPreferences.edit {
-        putString(ACCESS_TOKEN_KEY, token)
+    val email = sharedPreferences.getString(USER_EMAIL_KEY, null)
+    val pass = sharedPreferences.getString(USER_PASSWORD_KEY, null)
+    if (email == null || pass == null) {
+        return null
     }
+    return Pair(email, pass)
 }
 
-fun getUserId(context: Context): String? {
-    val sharedPreferences = sharedPreferences(context)
-    return sharedPreferences.getString(USER_ID_KEY, null)
-}
-
-fun updateUserId(context: Context, token: String) {
+fun updateEmailAndPassword(context: Context, email: String, password: String) {
     val sharedPreferences = sharedPreferences(context)
     sharedPreferences.edit {
-        putString(USER_ID_KEY, token)
+        putString(USER_EMAIL_KEY, email)
+        putString(USER_PASSWORD_KEY, password)
     }
 }
 

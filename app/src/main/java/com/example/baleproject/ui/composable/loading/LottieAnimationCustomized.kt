@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -16,7 +17,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 @Composable
 fun LottieAnimationCustomized(
     @RawRes id: Int,
-    padding: Int = 130,
+    padding: Dp = 130.dp,
     iterationCount: Int = Int.MAX_VALUE,
 ) {
     val composition by rememberLottieComposition(
@@ -29,7 +30,7 @@ fun LottieAnimationCustomized(
     LottieAnimation(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding.dp),
+            .padding(padding),
         composition = composition,
         progress = { progress },
     )

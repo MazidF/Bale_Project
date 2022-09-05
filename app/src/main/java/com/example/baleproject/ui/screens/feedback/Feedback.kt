@@ -1,6 +1,9 @@
 package com.example.baleproject.ui.screens.feedback
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -12,24 +15,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.baleproject.R
 import com.example.baleproject.data.result.Result
+import com.example.baleproject.ui.composable.button.BackButton
 import com.example.baleproject.ui.composable.button.ClearButton
 import com.example.baleproject.ui.composable.button.LoadingButton
 import com.example.baleproject.ui.composable.text.DescriptionText
 import com.example.baleproject.ui.composable.text.TextFieldCustomized
 import com.example.baleproject.ui.composable.text.TextFieldCustomizedState
 import com.example.baleproject.ui.composable.text.TitleText
+import com.example.baleproject.ui.composable.text.keybaordaction.NextKeyboardAction
+import com.example.baleproject.ui.composable.wrapper.CurveColumn
 
 @Composable
-fun Feedback(/*events: FeedbackEvents*/) {
-    FeedbackState(object : FeedbackEvents {
-        override fun back() {
-
-        }
-
-        override fun onFeedbackPosted() {
-
-        }
-    })
+fun Feedback(events: FeedbackEvents) {
+    FeedbackState(events)
 }
 
 @Composable
@@ -41,6 +39,12 @@ fun FeedbackState(
 
     val result = viewModel.postResult.collectAsState()
     val isLoading by remember { mutableStateOf(result.value is Result.Loading) }
+
+    LaunchedEffect(result.value is Result.Success) {
+        (result.value as? Result.Success)?.let {
+            events.onFeedbackPosted()
+        }
+    }
 
     val titleState = TextFieldCustomizedState(
         value = viewModel.title,
@@ -60,8 +64,10 @@ fun FeedbackState(
         titleState = titleState,
         descriptionState = descriptionState,
         descriptionFocusReq = descriptionFocusReq,
+        focusOnDescription = { descriptionFocusReq.requestFocus() },
         isLoading = isLoading,
         onPostClicked = { viewModel.post() },
+        onBackPress = events::back,
     )
 }
 
@@ -71,14 +77,14 @@ fun FeedbackContent(
     titleState: TextFieldCustomizedState,
     descriptionState: TextFieldCustomizedState,
     descriptionFocusReq: FocusRequester,
+    focusOnDescription: KeyboardActionScope.() -> Unit,
     isLoading: Boolean,
     onPostClicked: () -> Unit,
+    onBackPress: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 17.dp, vertical = 20.dp),
-    ) {
+    BackButton(isEnable = isLoading.not(), onBackPressed = onBackPress)
+
+    CurveColumn {
         TitleText(
             text = stringResource(id = R.string.feedback_maker_title),
             fontSize = 19.sp,
@@ -90,11 +96,15 @@ fun FeedbackContent(
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        TitleField(titleState)
+        TitleField(
+            titleState, focusOnDescription
+        )
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        DescriptionField(descriptionState, descriptionFocusReq)
+        DescriptionField(
+            descriptionState, descriptionFocusReq
+        )
 
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -122,7 +132,10 @@ private fun UsernameField(userName: String) {
 }
 
 @Composable
-private fun TitleField(state: TextFieldCustomizedState) {
+private fun TitleField(
+    state: TextFieldCustomizedState,
+    focusOnDescription: KeyboardActionScope.() -> Unit,
+) {
     Text(text = "Feedback Title")
 
     Spacer(modifier = Modifier.height(5.dp))
@@ -135,6 +148,7 @@ private fun TitleField(state: TextFieldCustomizedState) {
         trailingIcon = {
             ClearTrailingIcon(state.value, state.onValueChanged)
         },
+        keyboardAction = NextKeyboardAction(focusOnDescription),
     )
 }
 

@@ -15,4 +15,6 @@
     <string name="description">Description</string>
     <string name="post">Post</string>
     <string name="feedback_description">Description with at least 40 character</string>
+    <string name="unable_to_connect">Unable to Connect!!</string>
+    <string name="retry">Retry</string>
 </resources>

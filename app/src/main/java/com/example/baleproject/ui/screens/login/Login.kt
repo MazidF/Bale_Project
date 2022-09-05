@@ -1,21 +1,18 @@
 package com.example.baleproject.ui.screens.login
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,12 +22,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.baleproject.R
 import com.example.baleproject.data.result.Result
+import com.example.baleproject.ui.composable.button.BackButton
 import com.example.baleproject.ui.composable.button.LoadingButton
-import com.example.baleproject.ui.composable.color.surfaceColor
 import com.example.baleproject.ui.composable.text.TextFieldCustomized
 import com.example.baleproject.ui.composable.text.TextFieldCustomizedState
 import com.example.baleproject.ui.composable.text.TitleText
 import com.example.baleproject.ui.composable.text.keybaordaction.NextKeyboardAction
+import com.example.baleproject.ui.composable.wrapper.CurveColumn
 import com.example.baleproject.ui.theme.blue
 
 @Composable
@@ -91,14 +89,10 @@ private fun LoginContent(
     navigateToSignup: () -> Unit,
     onLoginButtonClicked: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 17.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ActionBar(isEnable = isLoading.not(), onClick = onBackPressed)
+    BackButton(isEnable = isLoading.not(), onBackPressed = onBackPressed)
+
+    CurveColumn {
+        ActionBar()
 
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -147,33 +141,12 @@ private fun SignupButton(navigateToSignup: () -> Unit, isLoading: Boolean) {
 }
 
 @Composable
-private fun ActionBar(
-    isEnable: Boolean,
-    onClick: () -> Unit,
-) {
-    Row {
-        TitleText(
-            text = stringResource(id = R.string.login),
-            fontSize = 24.sp,
-            modifier = Modifier.weight(1f),
-        )
-
-        IconButton(onClick = onClick, enabled = isEnable) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_clear),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(25.dp)
-                    .border(
-                        width = 1.5.dp,
-                        color = surfaceColor(),
-                        shape = CircleShape,
-                    )
-                    .padding(3.dp),
-                colorFilter = ColorFilter.tint(surfaceColor()),
-            )
-        }
-    }
+private fun ActionBar() {
+    TitleText(
+        text = stringResource(id = R.string.login),
+        fontSize = 24.sp,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
