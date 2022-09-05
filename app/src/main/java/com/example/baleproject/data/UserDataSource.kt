@@ -1,9 +1,6 @@
 package com.example.baleproject.data
 
-import com.example.baleproject.data.model.LoginUser
-import com.example.baleproject.data.model.RawUser
-import com.example.baleproject.data.model.SignupUser
-import com.example.baleproject.data.model.User
+import com.example.baleproject.data.model.*
 import com.example.baleproject.data.result.Result
 
 interface UserDataSource {
@@ -13,6 +10,7 @@ interface UserDataSource {
     ): Result<User>
 
     suspend fun updateUser(
+        header: String,
         userId: String,
         user: User,
     ): Result<User>
@@ -23,9 +21,9 @@ interface UserDataSource {
 
     suspend fun signup(
         user: SignupUser,
-    ): Result<String>
+    ): Result<Unit>
 
     suspend fun login(
         user: LoginUser,
-    ): Result<String>
+    ): Result<UserInfo>
 }

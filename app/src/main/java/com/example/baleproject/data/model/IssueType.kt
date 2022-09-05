@@ -1,13 +1,11 @@
 package com.example.baleproject.data.model
 
-import com.google.gson.annotations.SerializedName
-import java.lang.IllegalStateException
-
-enum class IssueType {
-    Bug,
-    Suggestion,
-    @SerializedName("")
-    None;
+enum class IssueType(
+    val query: String?,
+) {
+    Bug("Bug"),
+    Suggestion("Suggestion"),
+    None(null);
 
     fun get(name: String): IssueType {
         return values().firstOrNull {

@@ -1,6 +1,6 @@
 package com.example.baleproject.domain
 
-import androidx.compose.ui.graphics.Color
+import android.content.Context
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.baleproject.data.model.*
@@ -10,40 +10,61 @@ import com.example.baleproject.data.repository.UserRepository
 import com.example.baleproject.data.result.Result
 import com.example.baleproject.domain.paging.ItemPagingSource
 import com.example.baleproject.ui.model.IssueItem
-import com.example.baleproject.utils.toIssueItem
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
+import com.example.baleproject.utils.*
+import com.example.baleproject.utils.helpers.ConnectionHelper
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 class UseCase(
+    private val context: Context,
     private val userRepository: UserRepository,
     private val labelRepository: LabelRepository,
     private val issueRepository: IssueRepository,
     private val dispatcher: CoroutineDispatcher,
+    private val connectionHelper: ConnectionHelper,
 ) {
     private val scope by lazy {
         CoroutineScope(dispatcher + SupervisorJob())
     }
 
-    private lateinit var user: User
+    private var userInfo: UserInfo? = null
+
     private var labels: List<Label> = emptyList()
+    private var labelsHasBeenLoaded = false
+    private var labelsJob: Job? = null
 
     init {
         initialSetup()
     }
 
     private fun initialSetup() {
-//        loadLabels()
+        observeConnectionState()
+    }
+
+    private fun observeConnectionState() {
+        connectionHelper.connectionState.observeForever {
+            if (labelsHasBeenLoaded.not() and it.isConnected()) {
+                loadLabels()
+            }
+        }
     }
 
     private fun loadLabels() = scope.launch {
-        repeat(3) { // try 3 times to retrieve labels
-            val result = labelRepository.getLabels()
-            if (result is Result.Success) {
-                labels = result.data()
-                return@launch
+        labelsJob?.cancelAndJoin()
+        labelsJob = scope.launch {
+            repeat(3) { // try 3 times to retrieve labels
+                val flow = safeApiCall(false) {
+                    labelRepository.getLabels()
+                }
+                val result = flow.firstOrNull {
+                    it is Result.Success
+                } as? Result.Success
+                result?.let {
+                    labels = it.data()
+                    labelsHasBeenLoaded = true
+                    return@launch
+                }
+                delay(2_000)
             }
         }
     }
@@ -54,7 +75,6 @@ class UseCase(
         sortType: SortType = SortType.ASC,
         pagingConfig: PagingConfig,
     ): Flow<PagingData<IssueItem>> {
-
         return ItemPagingSource.pager(
             config = pagingConfig,
             dataLoader = object : ItemPagingSource.PagingDataLoader<IssueItem> {
@@ -78,54 +98,75 @@ class UseCase(
     }
 
     private fun Issue.getIssueLabels(): List<Label> {
-        /*labels.filter {
+        return labels.filter {
             it.id in labelIds
-        }*/
-        return listOf(
-            Label(
-                id = "-1",
-                name = "Programming",
-                color = Color.Red,
-            ),
-            Label(
-                id = "-1",
-                name = "Game",
-                color = Color.Blue,
-            ),
+        }
+    }
+
+    fun signup(name: String, email: String, password: String): Flow<Result<Unit>> {
+        val user = SignupUser(
+            name = name,
+            email = email,
+            password = password,
         )
+        return safeApiCall {
+            userRepository.signup(user)
+        }
     }
 
-/*    fun userRepository(block: UserRepository.() -> Unit) {
-        userRepository.block()
+    fun login(email: String, password: String): Flow<Result<UserInfo>> {
+        val user = LoginUser(
+            email = email,
+            password = password,
+        )
+        return safeApiCall {
+            userRepository.login(user).also {
+                saveUserInfo(it)
+            }
+        }
     }
 
-    fun labelRepository(block: LabelRepository.() -> Unit) {
-        labelRepository.block()
+    private fun saveUserInfo(result: Result<UserInfo>) {
+        if (result is Result.Success) {
+            saveUserInfo(result.data())
+        }
     }
 
-    fun issueRepository(block: IssueRepository.() -> Unit) {
-        issueRepository.block()
+    private fun saveUserInfo(userInfo: UserInfo) {
+        this.userInfo = userInfo
     }
 
-    suspend fun userRepository(block: suspend UserRepository.() -> Unit) {
-        userRepository.block()
+    fun getUserName(): String {
+        return userInfo!!.name
     }
 
-    suspend fun labelRepository(block: suspend LabelRepository.() -> Unit) {
-        labelRepository.block()
+    suspend fun createIssue(
+        title: String,
+        description: String,
+        type: IssueType,
+        labelIds: List<String>,
+    ): Flow<Result<Unit>> {
+        val rawIssue = RawIssue(
+            title = title,
+            description = description,
+            type = type,
+            labelIds = labelIds,
+        )
+        return safeApiCall {
+            issueRepository.createIssue(userInfo!!.accessToken, rawIssue)
+        }
     }
 
-    suspend fun issueRepository(block: suspend IssueRepository.() -> Unit) {
-        issueRepository.block()
-    }*/
-
-    fun <T> safeApiCall(
+    private fun <T> safeApiCall(
+        emitLoading: Boolean = true,
         block: suspend () -> Result<T>,
     ): Flow<Result<T>> {
         return flow {
             emit(block())
         }.onStart {
-            emit(Result.loading())
+            if (emitLoading) {
+                emit(Result.loading())
+            }
         }.catch { cause ->
             emit(Result.fail(cause))
         }.flowOn(dispatcher)

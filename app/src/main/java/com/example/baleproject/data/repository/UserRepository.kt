@@ -1,10 +1,7 @@
 package com.example.baleproject.data.repository
 
 import com.example.baleproject.data.UserDataSource
-import com.example.baleproject.data.model.LoginUser
-import com.example.baleproject.data.model.RawUser
-import com.example.baleproject.data.model.SignupUser
-import com.example.baleproject.data.model.User
+import com.example.baleproject.data.model.*
 import com.example.baleproject.data.result.Result
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -20,10 +17,11 @@ class UserRepository(
     }
 
     suspend fun updateUser(
+        header: String,
         userId: String,
         user: User,
     ): Result<User> {
-        return dataSource.updateUser(userId, user)
+        return dataSource.updateUser(header, userId, user)
     }
 
     suspend fun createUser(
@@ -34,13 +32,13 @@ class UserRepository(
 
     suspend fun signup(
         user: SignupUser,
-    ): Result<String> {
+    ): Result<Unit> {
         return dataSource.signup(user)
     }
 
     suspend fun login(
         user: LoginUser,
-    ): Result<String> {
+    ): Result<UserInfo> {
         return dataSource.login(user)
     }
 }

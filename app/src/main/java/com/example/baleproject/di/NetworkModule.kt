@@ -1,18 +1,27 @@
 package com.example.baleproject.di
 
+import android.content.Context
+import com.example.baleproject.data.model.Issue
 import com.example.baleproject.data.model.User
+import com.example.baleproject.data.model.UserInfo
 import com.example.baleproject.data.remote.api.IssueApi
 import com.example.baleproject.data.remote.api.LabelApi
 import com.example.baleproject.data.remote.api.UserApi
+import com.example.baleproject.data.remote.api.deserializer.IssueDeserializer
 import com.example.baleproject.data.remote.api.deserializer.UserDeserializer
+import com.example.baleproject.data.remote.api.deserializer.UserInfoDeserializer
+import com.example.baleproject.di.qualifiers.AuthenticationToken
 import com.example.baleproject.di.qualifiers.Authorizer
 import com.example.baleproject.di.qualifiers.Logger
+import com.example.baleproject.utils.ACCESS_TOKEN_KEY
 import com.example.baleproject.utils.SERVER_BASE_URL
+import com.example.baleproject.utils.getAccessToken
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -27,28 +36,21 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideGson(): Gson {
-        return GsonBuilder()
-            .registerTypeAdapter(User::class.java, UserDeserializer)
-            .create()
+    @AuthenticationToken
+    fun provideAccessToken(
+        @ApplicationContext context: Context,
+    ): String? {
+        return getAccessToken(context)
     }
 
     @Provides
     @Singleton
-    @Authorizer
-    fun provideAuthorizerInterceptor(): Interceptor {
-        return Interceptor { chain ->
-            val oldRequest = chain.request()
-
-            val newUrl = oldRequest.url().newBuilder()
-                .build()
-
-            val newRequest = chain.request().newBuilder()
-                .url(newUrl)
-                .build()
-
-            chain.proceed(newRequest)
-        }
+    fun provideGson(): Gson {
+        return GsonBuilder()
+            .registerTypeAdapter(User::class.java, UserDeserializer)
+            .registerTypeAdapter(Issue::class.java, IssueDeserializer)
+            .registerTypeAdapter(UserInfo::class.java, UserInfoDeserializer)
+            .create()
     }
 
     @Provides
@@ -64,11 +66,11 @@ class NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         @Logger logger: Interceptor,
-        @Authorizer authorizer: Interceptor,
+//        @Authorizer authorizer: Interceptor,
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(logger)
-            .addInterceptor(authorizer)
+//            .addInterceptor(authorizer)
             .build()
     }
 

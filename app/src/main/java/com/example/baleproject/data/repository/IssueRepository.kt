@@ -19,9 +19,10 @@ class IssueRepository(
     }
 
     suspend fun createIssue(
+        header: String,
         issue: RawIssue,
-    ): Result<String> {
-        return dataSource.createIssue(issue)
+    ): Result<Unit> {
+        return dataSource.createIssue(header, issue)
     }
 
     suspend fun getIssue(
@@ -31,10 +32,11 @@ class IssueRepository(
     }
 
     suspend fun updateIssue(
+        header: String,
         issueId: String,
         issue: RawIssue,
     ): Result<Unit> {
-        return dataSource.updateIssue(issueId, issue)
+        return dataSource.updateIssue(header, issueId, issue)
     }
 
     suspend fun getCommentsOfIssue(
@@ -45,22 +47,25 @@ class IssueRepository(
     }
 
     suspend fun createCommentForIssue(
+        header: String,
         issueId: String,
         text: String,
-    ): Result<String> {
-        return dataSource.createCommentForIssue(issueId, text)
+    ): Result<Unit> {
+        return dataSource.createCommentForIssue(header, issueId, text)
     }
 
     suspend fun addLabelToIssue(
+        header: String,
         issueId: String,
         labelIds: Array<String>,
     ): Result<Unit> {
-        return dataSource.addLabelToIssue(issueId, labelIds)
+        return dataSource.addLabelToIssue(header, issueId, labelIds)
     }
 
     suspend fun removeLabelOfIssue(
+        header: String,
         issueId: String,
     ): Result<Unit> {
-        return dataSource.removeLabelOfIssue(issueId)
+        return dataSource.removeLabelOfIssue(header, issueId)
     }
 }

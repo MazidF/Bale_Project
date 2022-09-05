@@ -1,19 +1,10 @@
 package com.example.baleproject.data.model
 
 enum class IssueStatus(
-    val title: String,
-    val description: String,
+    val query: String?,
 ) {
-    Pending(
-        title = "Pending",
-        description = ""
-    ),
-    InProgress(
-        title = "In-Progress",
-        description = ""
-    ),
-    Done(
-        title = "Done",
-        description = ""
-    );
+    Pending("Pending"),
+    InProgress("InProgress"),
+    Done("Done"),
+    None(null);
 }

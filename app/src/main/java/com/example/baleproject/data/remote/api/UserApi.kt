@@ -1,9 +1,7 @@
 package com.example.baleproject.data.remote.api
 
-import com.example.baleproject.data.model.LoginUser
-import com.example.baleproject.data.model.RawUser
-import com.example.baleproject.data.model.SignupUser
-import com.example.baleproject.data.model.User
+import com.example.baleproject.data.model.*
+import com.example.baleproject.utils.ACCESS_TOKEN_KEY
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -15,6 +13,7 @@ interface UserApi {
 
     @PATCH("users/{userId}")
     suspend fun updateUser(
+        @Header(ACCESS_TOKEN_KEY) header: String,
         @Path("userId") userId: String,
         @Body user: User,
     ): Response<User>
@@ -27,12 +26,12 @@ interface UserApi {
     @POST("auth/signup")
     suspend fun signup(
         @Body user: SignupUser,
-    ): Response<String>
+    ): Response<Unit>
 
     @POST("auth/login")
     suspend fun login(
         @Body user: LoginUser,
-    ): Response<String>
+    ): Response<UserInfo>
 
 }
 

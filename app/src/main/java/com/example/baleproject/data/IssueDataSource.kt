@@ -2,6 +2,8 @@ package com.example.baleproject.data
 
 import com.example.baleproject.data.model.*
 import com.example.baleproject.data.result.Result
+import com.example.baleproject.utils.ACCESS_TOKEN_KEY
+import retrofit2.http.Header
 
 interface IssueDataSource {
 
@@ -13,14 +15,16 @@ interface IssueDataSource {
     ): Result<List<Issue>>
 
     suspend fun createIssue(
+        header: String,
         issue: RawIssue,
-    ): Result<String>
+    ): Result<Unit>
 
     suspend fun getIssue(
         issueId: String,
     ): Result<Issue>
 
     suspend fun updateIssue(
+        header: String,
         issueId: String,
         issue: RawIssue,
     ): Result<Unit>
@@ -31,16 +35,19 @@ interface IssueDataSource {
     ): Result<List<Comment>>
 
     suspend fun createCommentForIssue(
+        header: String,
         issueId: String,
         text: String,
-    ): Result<String>
+    ): Result<Unit>
 
     suspend fun addLabelToIssue(
+        header: String,
         issueId: String,
         labelIds: Array<String>,
     ): Result<Unit>
 
     suspend fun removeLabelOfIssue(
+        header: String,
         issueId: String,
     ): Result<Unit>
 
