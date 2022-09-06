@@ -7,17 +7,15 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.baleproject.data.model.Label
+import com.example.baleproject.ui.model.LabelItem
 
 @Composable
-fun LabelItemCompose(label: Label) {
+fun LabelItemCompose(label: LabelItem) {
     Surface(
+        color = label.color,
         shape = RoundedCornerShape(5.dp),
-//        color = Color(198, 205, 207, 255),
-        color = Color(0xFFE7E6E6),
         modifier = Modifier.padding(5.dp),
     ) {
         Text(
@@ -25,8 +23,7 @@ fun LabelItemCompose(label: Label) {
             modifier = Modifier
                 .wrapContentWidth()
                 .padding(vertical = 5.dp, horizontal = 10.dp),
-            color = label.color,
-//            color = Color(17, 95, 146, 255),
+            color = Color.White,
         )
     }
 }

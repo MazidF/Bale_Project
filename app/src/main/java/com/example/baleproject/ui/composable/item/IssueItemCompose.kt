@@ -4,18 +4,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.baleproject.data.model.Issue
 import com.example.baleproject.ui.composable.counter.CommentCounter
 import com.example.baleproject.ui.composable.counter.VoteCounter
-import com.example.baleproject.ui.composable.list.LabelList
 import com.example.baleproject.ui.composable.shimmer.shapes.BoxShimmer
-import com.example.baleproject.ui.composable.shimmer.shapes.CircleShimmer
 import com.example.baleproject.ui.composable.text.DescriptionText
 import com.example.baleproject.ui.composable.text.TitleText
 import com.example.baleproject.ui.composable.wrapper.ItemCardComposeWithColorLine
-import com.example.baleproject.ui.model.IssueItem
 
 @Composable
-fun IssueItemCompose(issue: IssueItem) {
+fun IssueItemCompose(issue: Issue) {
     ItemCardComposeWithColorLine {
         Column(
             modifier = Modifier
@@ -27,9 +25,9 @@ fun IssueItemCompose(issue: IssueItem) {
 
             DescriptionText(text = issue.description)
 
-            Spacer(modifier = Modifier.height(7.dp))
+/*            Spacer(modifier = Modifier.height(7.dp))
 
-            LabelList(labels = issue.labels)
+            LabelList(labels = issue.labels)*/
 
             Spacer(modifier = Modifier.height(10.dp))
 

@@ -6,9 +6,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import com.example.baleproject.data.model.Label
 import com.example.baleproject.ui.composable.item.LabelItemCompose
+import com.example.baleproject.ui.model.LabelItem
 
 @Composable
-fun LabelList(labels: List<Label>) {
+fun LabelList(labels: List<LabelItem>) {
     LazyRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {

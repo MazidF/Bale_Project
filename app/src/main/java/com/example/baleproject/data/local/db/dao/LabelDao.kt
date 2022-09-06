@@ -1,10 +1,5 @@
 package com.example.baleproject.data.local.db.dao
 
-import androidx.room.Dao
-import androidx.room.Query
-import com.example.baleproject.data.model.Label
-import kotlinx.coroutines.flow.Flow
-
 /*
 @Dao
 interface LabelDao : IDao<Label> {
