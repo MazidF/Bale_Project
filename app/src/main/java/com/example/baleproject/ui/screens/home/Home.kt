@@ -1,147 +1,126 @@
 package com.example.baleproject.ui.screens.home
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
-import com.example.baleproject.data.model.IssueStatus
-import com.example.baleproject.ui.composable.DescriptionText
-import com.example.baleproject.ui.composable.IssueItemView
-import com.example.baleproject.ui.composable.TitleText
-import com.example.baleproject.ui.model.IssueItem
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
+import com.example.baleproject.R
+import com.example.baleproject.data.model.Issue
+import com.example.baleproject.ui.composable.dialog.LoginDialog
+import com.example.baleproject.ui.composable.item.IssueItemCompose
+import com.example.baleproject.ui.theme.blue
 
 @Composable
-fun Home() {
-    HomeState()
+fun Home(
+    events: HomeEvents,
+) {
+    HomeState(events)
 }
 
-
 @Composable
-private fun HomeState(viewModel: HomeViewModel = hiltViewModel()) {
-    val pagerPagesItems = IssueStatus.values().map {
-        viewModel.loadIssues(it).collectAsLazyPagingItems()
-    }
-    val titles = IssueStatus.values().map {
-        it.title
-    }
-    val descriptions = IssueStatus.values().map {
-        it.description
-    }
+private fun HomeState(
+    events: HomeEvents,
+    viewModel: HomeViewModel = hiltViewModel(),
+) {
+    val lazyPagingItems by remember { viewModel.currentFlow() }
+    val lazyListState = rememberLazyListState()
+
+    var loginDialogIsOpen by rememberSaveable { mutableStateOf(false) }
+    val showFAB by remember { derivedStateOf { lazyListState.isScrollInProgress } }
 
     HomeContent(
-        titles = titles,
-        descriptions = descriptions,
-        pagerPagesItems = pagerPagesItems,
+        lazyListState = lazyListState,
+        lazyPagingItems = lazyPagingItems.collectAsLazyPagingItems(),
+        showFAB = showFAB,
+        onCreateIssue = {
+            if (viewModel.hasBeenLogin()) {
+                events.navigateToFeedbackPage()
+            } else {
+                loginDialogIsOpen = true
+            }
+        },
+        loginDialogIsOpen = loginDialogIsOpen,
+        onDialogLoginButton = events::navigateToLoginPage,
+        onLoginDialogDismissed = { loginDialogIsOpen = false }
     )
 }
 
 @Composable
 private fun HomeContent(
-    titles: List<String>,
-    descriptions: List<String>,
-    pagerPagesItems: List<LazyPagingItems<IssueItem>>,
+    lazyListState: LazyListState,
+    lazyPagingItems: LazyPagingItems<Issue>,
+    showFAB: Boolean,
+    onCreateIssue: () -> Unit,
+    loginDialogIsOpen: Boolean,
+    onDialogLoginButton: () -> Unit,
+    onLoginDialogDismissed: () -> Unit,
 ) {
-    PagerState(
-        titles = titles,
-        descriptions = descriptions,
-        pagingItems = pagerPagesItems
-    )
-}
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onCreateIssue,
+                backgroundColor = blue,
+                shape = RoundedCornerShape(30.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .wrapContentWidth(align = Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_add),
+                        contentDescription = null,
+                        tint = Color.White,
+                    )
 
+                    AnimatedVisibility(visible = showFAB.not()) {
+                        Spacer(modifier = Modifier.width(8.dp))
 
-@Composable
-private fun PagerState(
-    titles: List<String>,
-    descriptions: List<String>,
-    pagingItems: List<LazyPagingItems<IssueItem>>,
-) {
-    PagerContent(
-        titles = titles,
-        descriptions = descriptions,
-        pagingItems = pagingItems,
-    )
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-private fun PagerContent(
-    titles: List<String>,
-    descriptions: List<String>,
-    pagingItems: List<LazyPagingItems<IssueItem>>,
-) {
-    HorizontalPager(
-        count = pagingItems.size,
-    ) { currentPage ->
-        PagerPage(
-            title = titles[currentPage],
-            description = descriptions[currentPage],
-            pagingItem = pagingItems[currentPage],
-        )
-    }
-}
-
-@Composable
-private fun PagerPage(
-    title: String,
-    description: String,
-    pagingItem: LazyPagingItems<IssueItem>,
-) {
-    val loadState = pagingItem.loadState
-    LazyColumn {
-        item {
-            PageTitle(title, description)
-        }
-
-        if (loadState.refresh == LoadState.Loading) {
-            item {
-                PageRefreshLoading()
+                        Text(
+                            text = "Post an issue",
+                            color = Color.White,
+                            modifier = Modifier.padding(end = 4.dp),
+                        )
+                    }
+                }
+            }
+        },
+    ) { padding ->
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier.padding(padding),
+        ) {
+            items(items = lazyPagingItems, key = { it.id }) { issue ->
+                issue?.let {
+                    IssueItemCompose(issue = issue)
+                }
             }
         }
 
-        items(pagingItem, key = { it }) { issue ->
-            issue?.let {
-                IssueItemView(issue = it)
-            }
-        }
-
-        if (loadState.append == LoadState.Loading) {
-            item {
-                PageAppendLoading()
-            }
+        if (loginDialogIsOpen) {
+            LoginDialog(
+                onLoginButton = onDialogLoginButton,
+                onDismissed = onLoginDialogDismissed,
+            )
         }
     }
-}
-
-@Composable
-fun PageRefreshLoading() {
-
-}
-
-@Composable
-fun PageAppendLoading() {
-    CircularProgressIndicator(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentWidth(Alignment.CenterHorizontally),
-    )
-}
-
-@Composable
-fun PageTitle(title: String, description: String) {
-    TitleText(text = title)
-    Spacer(modifier = Modifier.height(10.dp))
-    DescriptionText(text = description)
 }

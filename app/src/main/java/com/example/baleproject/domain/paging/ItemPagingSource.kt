@@ -19,7 +19,7 @@ class ItemPagingSource<T : Any>(
             LoadResult.Page(
                 data = items,
                 prevKey = if (page == PAGING_FIRST_PAGE_INDEX) null else page.minus(1),
-                nextKey = if (items.isEmpty()) null else page.plus(1),
+                nextKey = if (items.size < params.loadSize) null else page.plus(1),
             )
         } else {
             LoadResult.Error((data as Result.Fail).error())

@@ -9,11 +9,11 @@ import com.example.baleproject.data.repository.LabelRepository
 import com.example.baleproject.data.repository.UserRepository
 import com.example.baleproject.data.result.Result
 import com.example.baleproject.domain.paging.ItemPagingSource
-import com.example.baleproject.ui.model.IssueItem
 import com.example.baleproject.utils.getEmailAndPassword
 import com.example.baleproject.utils.helpers.ConnectionHelper
-import com.example.baleproject.utils.toIssueItem
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 
 class UseCase(
@@ -30,9 +30,9 @@ class UseCase(
 
     private var userInfo: UserInfo? = null
 
-    private var labels: List<Label> = emptyList()
+/*    private var labels: List<Label> = emptyList()
     private var labelsHasBeenLoaded = false
-    private var labelsJob: Job? = null
+    private var labelsJob: Job? = null*/
 
     init {
         initialSetup()
@@ -44,13 +44,13 @@ class UseCase(
 
     private fun observeConnectionState() {
         connectionHelper.connectionState.observeForever {
-            if (labelsHasBeenLoaded.not() and it.isConnected()) {
+/*            if (labelsHasBeenLoaded.not() and it.isConnected()) {
                 loadLabels()
-            }
+            }*/
         }
     }
 
-    private fun loadLabels() = scope.launch {
+/*    private fun loadLabels() = scope.launch {
         labelsJob?.cancelAndJoin()
         labelsJob = scope.launch {
             repeat(3) { // try 3 times to retrieve labels
@@ -68,40 +68,30 @@ class UseCase(
                 delay(2_000)
             }
         }
-    }
+    }*/
 
     fun loadIssues(
         status: IssueStatus,
         type: IssueType = IssueType.None,
         sortType: SortType = SortType.ASC,
         pagingConfig: PagingConfig,
-    ): Flow<PagingData<IssueItem>> {
+    ): Flow<PagingData<Issue>> {
         return ItemPagingSource.pager(
             config = pagingConfig,
-            dataLoader = object : ItemPagingSource.PagingDataLoader<IssueItem> {
+            dataLoader = object : ItemPagingSource.PagingDataLoader<Issue> {
                 override suspend fun loadData(
                     pageNumber: Int,
                     perPage: Int
-                ): Result<List<IssueItem>> {
+                ): Result<List<Issue>> {
                     return issueRepository.getIssues(
                         offset = (pageNumber - 1) * perPage,
                         status = status,
                         type = type,
                         sortType = sortType,
-                    ).map {
-                        map { issue ->
-                            issue.toIssueItem(issue.getIssueLabels())
-                        }
-                    }
+                    )
                 }
             }
         ).flow
-    }
-
-    private fun Issue.getIssueLabels(): List<Label> {
-        return labels.filter {
-            it.id in labelIds
-        }
     }
 
     fun signup(name: String, email: String, password: String): Flow<Result<Unit>> {
@@ -165,6 +155,10 @@ class UseCase(
         return safeApiCall {
             issueRepository.createIssue(userInfo!!.cookie, rawIssue)
         }
+    }
+
+    fun hasBeenLogin(): Boolean {
+        return userInfo != null
     }
 
     private fun <T> safeApiCall(
