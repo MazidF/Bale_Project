@@ -157,7 +157,7 @@ class UseCase(
         }
     }
 
-    fun hasBeenLogin(): Boolean {
+    fun hasBeenLoggedIn(): Boolean {
         return userInfo != null
     }
 
