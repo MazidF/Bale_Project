@@ -41,6 +41,12 @@ private fun LoginState(
     events: LoginEvents,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(true) { // initial setup
+        val (email, password) = events.getEmailAndPassword()
+        viewModel.email = email
+        viewModel.password = password
+    }
+
     val passwordFocusReq = remember { FocusRequester() }
 
     val loginResult = viewModel.loginResult.collectAsState()

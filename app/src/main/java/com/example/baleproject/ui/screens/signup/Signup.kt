@@ -49,7 +49,7 @@ private fun SignupState(
 
     LaunchedEffect(key1 = signUpResult.value is Result.Success) {
         (signUpResult.value as? Result.Success)?.data()?.let { info ->
-            events.onSignupCompleted()
+            events.onSignupCompleted(viewModel.email, viewModel.password)
             logger("onSignupCompleted")
         }
     }
