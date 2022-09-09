@@ -8,7 +8,7 @@ data class IssueItem(
     val vote: Vote,
     val title: String,
     val reviewed: Boolean,
-    val commentCounts: Int,
+    val commentsCount: Int,
     val description: String,
     val labels: List<LabelItem>,
 ) : Serializable

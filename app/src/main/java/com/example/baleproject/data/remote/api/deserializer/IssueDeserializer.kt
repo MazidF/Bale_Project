@@ -19,11 +19,10 @@ object IssueDeserializer : JsonDeserializer<Issue> {
             description = this["description"].asString,
             reviewed = this["reviewed"].asBoolean,
             vote = Vote.get(
-                name = this["vote"]?.asJsonObject?.get("type")?.asString ?: "Up",
                 upVoteCount = this["upVoteCount"].asInt,
                 downVoteCount = this["downVoteCount"].asInt,
             ),
-            commentCounts = this["commentsCount"].asInt,
+            commentsCount = this["commentsCount"].asInt,
             labelIds = this["labels"].asJsonArray.map {
                 it.asString
             },

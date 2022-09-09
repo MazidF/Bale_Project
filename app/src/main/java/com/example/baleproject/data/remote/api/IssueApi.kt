@@ -1,8 +1,6 @@
 package com.example.baleproject.data.remote.api
 
-import com.example.baleproject.data.model.Comment
-import com.example.baleproject.data.model.Issue
-import com.example.baleproject.data.model.RawIssue
+import com.example.baleproject.data.model.*
 import com.example.baleproject.utils.ACCESS_TOKEN_KEY
 import retrofit2.Response
 import retrofit2.http.*
@@ -24,11 +22,6 @@ interface IssueApi {
         @Body issue: RawIssue,
     ): Response<Unit>
 
-    @GET("issues/{issueId}")
-    suspend fun getIssue(
-        @Path("issueId") issueId: String,
-    ): Response<Issue>
-
     @PATCH("issues/{issueId}")
     suspend fun updateIssue(
         @Header(ACCESS_TOKEN_KEY) header: String,
@@ -46,7 +39,7 @@ interface IssueApi {
     suspend fun createCommentForIssue(
         @Header(ACCESS_TOKEN_KEY) header: String,
         @Path("issueId") issueId: String,
-        @Body text: String,
+        @Body comment: RawComment,
     ): Response<Unit>
 
     @POST("issues/{issueId}/labels")
@@ -62,5 +55,17 @@ interface IssueApi {
         @Path("issueId") issueId: String,
     ): Response<Unit>
 
-    // TODO: add api for updating votes
+    @POST("issues/{issueId}/votes")
+    suspend fun vote(
+        @Header(ACCESS_TOKEN_KEY) header: String,
+        @Path("issueId") issueId: String,
+        @Body vote: RawVote,
+    ): Response<Unit>
+
+    @PATCH("issues/{issueId}/votes")
+    suspend fun updateVote(
+        @Header(ACCESS_TOKEN_KEY) header: String,
+        @Path("issueId") issueId: String,
+        @Body vote: RawVote,
+    ): Response<Unit>
 }

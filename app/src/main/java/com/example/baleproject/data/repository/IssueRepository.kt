@@ -68,4 +68,12 @@ class IssueRepository(
     ): Result<Unit> {
         return dataSource.removeLabelOfIssue(header, issueId)
     }
+
+    suspend fun vote(
+        header: String,
+        issueId: String,
+        vote: RawVote,
+    ): Result<Unit> {
+        return dataSource.vote(header, issueId, vote)
+    }
 }

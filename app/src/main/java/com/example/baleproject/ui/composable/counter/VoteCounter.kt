@@ -34,11 +34,7 @@ fun VoteCounter(vote: Vote) {
             Spacer(modifier = Modifier.width(2.dp))
 
             TitleText(
-                text = if (isUp) {
-                    vote.upVoteCount
-                } else {
-                    vote.downVoteCount
-                }.toString(),
+                text = vote.vote().toString(),
             )
         }
     }

@@ -2,8 +2,6 @@ package com.example.baleproject.data
 
 import com.example.baleproject.data.model.*
 import com.example.baleproject.data.result.Result
-import com.example.baleproject.utils.ACCESS_TOKEN_KEY
-import retrofit2.http.Header
 
 interface IssueDataSource {
 
@@ -49,6 +47,12 @@ interface IssueDataSource {
     suspend fun removeLabelOfIssue(
         header: String,
         issueId: String,
+    ): Result<Unit>
+
+    suspend fun vote(
+        header: String,
+        issueId: String,
+        vote: RawVote,
     ): Result<Unit>
 
     // TODO: check Result<Unit> not to be fail all the time

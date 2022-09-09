@@ -13,7 +13,11 @@ class ItemPagingSource<T : Any>(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
         val page = params.key ?: PAGING_FIRST_PAGE_INDEX
-        val data = dataLoader.loadData(pageNumber = page, perPage = params.loadSize)
+        val data = try {
+            dataLoader.loadData(pageNumber = page, perPage = params.loadSize)
+        } catch (e: Exception) {
+            Result.fail(e)
+        }
         return if (data is Result.Success) {
             val items = data.data()
             LoadResult.Page(

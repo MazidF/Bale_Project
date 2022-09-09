@@ -16,7 +16,7 @@ fun Issue.toIssueItem(labels: List<LabelItem>): IssueItem {
         labels = labels,
         reviewed = reviewed,
         description = description,
-        commentCounts = commentCounts,
+        commentsCount = commentsCount,
     )
 }
 

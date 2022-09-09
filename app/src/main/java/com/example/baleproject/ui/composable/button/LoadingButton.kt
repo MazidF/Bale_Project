@@ -23,6 +23,7 @@ fun LoadingButton(
     text: String,
     isLoading: Boolean,
     isEnable: Boolean = true,
+    matchWidth: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
@@ -32,6 +33,13 @@ fun LoadingButton(
         ),
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
+            .then(
+                if (matchWidth) {
+                    Modifier.fillMaxWidth()
+                } else {
+                    Modifier.wrapContentWidth()
+                }
+            )
             .wrapContentHeight(align = Alignment.CenterVertically)
             .height(45.dp),
         enabled = isEnable,
@@ -39,7 +47,6 @@ fun LoadingButton(
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .scale(.7f)
                     .wrapContentWidth(Alignment.CenterHorizontally),
                 color = Color.White,
@@ -49,7 +56,6 @@ fun LoadingButton(
                 text = text,
                 fontSize = 17.sp,
                 color = Color.White,
-                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
         }

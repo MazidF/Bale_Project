@@ -9,10 +9,12 @@ import com.example.baleproject.data.repository.LabelRepository
 import com.example.baleproject.data.repository.UserRepository
 import com.example.baleproject.data.result.Result
 import com.example.baleproject.domain.paging.ItemPagingSource
-import com.example.baleproject.utils.getEmailAndPassword
+import com.example.baleproject.ui.model.LabelItem
+import com.example.baleproject.utils.*
 import com.example.baleproject.utils.helpers.ConnectionHelper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 
@@ -30,9 +32,18 @@ class UseCase(
 
     private var userInfo: UserInfo? = null
 
-/*    private var labels: List<Label> = emptyList()
-    private var labelsHasBeenLoaded = false
-    private var labelsJob: Job? = null*/
+    private val pagingConfig by lazy {
+        PagingConfig(
+            pageSize = PAGING_PAGE_SIZE,
+            prefetchDistance = PAGING_FETCH_DISTANCE,
+            initialLoadSize = PAGING_INITIAL_LOAD_SIZE,
+            maxSize = PAGING_MAX_SIZE,
+            enablePlaceholders = true,
+        )
+    }
+
+    private var labels: HashMap<String, LabelItem> = hashMapOf()
+    private var labelsJob: Job? = null
 
     init {
         initialSetup()
@@ -50,31 +61,11 @@ class UseCase(
         }
     }
 
-/*    private fun loadLabels() = scope.launch {
-        labelsJob?.cancelAndJoin()
-        labelsJob = scope.launch {
-            repeat(3) { // try 3 times to retrieve labels
-                val flow = safeApiCall(false) {
-                    labelRepository.getLabels()
-                }
-                val result = flow.firstOrNull {
-                    it is Result.Success
-                } as? Result.Success
-                result?.let {
-                    labels = it.data()
-                    labelsHasBeenLoaded = true
-                    return@launch
-                }
-                delay(2_000)
-            }
-        }
-    }*/
-
     fun loadIssues(
         status: IssueStatus,
         type: IssueType = IssueType.None,
         sortType: SortType = SortType.ASC,
-        pagingConfig: PagingConfig,
+        pagingConfig: PagingConfig = this.pagingConfig,
     ): Flow<PagingData<Issue>> {
         return ItemPagingSource.pager(
             config = pagingConfig,
@@ -91,7 +82,49 @@ class UseCase(
                     )
                 }
             }
-        ).flow
+        ).flow.flowOn(dispatcher)
+    }
+
+    fun loadComments(
+        issueId: String,
+        pagingConfig: PagingConfig = this.pagingConfig,
+    ): Flow<PagingData<Comment>> {
+        return ItemPagingSource.pager(
+            config = pagingConfig,
+            dataLoader = object : ItemPagingSource.PagingDataLoader<Comment> {
+                override suspend fun loadData(
+                    pageNumber: Int,
+                    perPage: Int
+                ): Result<List<Comment>> {
+                    return issueRepository.getCommentsOfIssue(
+                        issueId = issueId,
+                        offset = (pageNumber - 1) * perPage,
+                    )
+                }
+            }
+        ).flow.flowOn(dispatcher)
+    }
+
+    suspend fun loadLabels(ids: List<String>): Result<List<LabelItem>> {
+        return if (updateLabels()) {
+            val list = List(ids.size) {
+                labels[ids[it]] ?: LabelItem.empty(ids[it])
+            }
+            Result.success(list)
+        } else {
+            Result.fail("Unable to get labels")
+        }
+    }
+
+    private suspend fun updateLabels(): Boolean {
+        val result = labelRepository.getLabels().map {
+            this.associate {
+                it.id to it.toLabelItem()
+            }
+        }
+        val map = (result as? Result.Success)?.data() ?: return false
+        labels.putAll(map)
+        return true
     }
 
     fun signup(name: String, email: String, password: String): Flow<Result<Unit>> {
@@ -159,6 +192,32 @@ class UseCase(
 
     fun hasBeenLoggedIn(): Boolean {
         return userInfo != null
+    }
+
+    fun vote(issueId: String, vote: RawVote): Flow<Result<Unit>> {
+        return safeApiCall {
+            issueRepository.vote(
+                header = userInfo!!.cookie,
+                issueId = issueId,
+                vote = vote,
+            )
+        }
+    }
+
+    fun createComment(issueId: String, comment: String): Flow<Result<Unit>> {
+        return safeApiCall {
+            issueRepository.createCommentForIssue(
+                header = userInfo!!.cookie,
+                issueId = issueId,
+                text = comment
+            )
+        }
+    }
+
+    fun getIssue(issueId: String): Flow<Result<Issue>> {
+        return safeApiCall {
+            issueRepository.getIssue(issueId)
+        }
     }
 
     private fun <T> safeApiCall(

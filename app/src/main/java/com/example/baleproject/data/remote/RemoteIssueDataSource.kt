@@ -4,6 +4,7 @@ import com.example.baleproject.data.IssueDataSource
 import com.example.baleproject.data.model.*
 import com.example.baleproject.data.remote.api.IssueApi
 import com.example.baleproject.data.result.Result
+import com.example.baleproject.utils.PAGING_PAGE_SIZE
 import com.example.baleproject.utils.asResult
 
 class RemoteIssueDataSource(
@@ -24,7 +25,28 @@ class RemoteIssueDataSource(
     }
 
     override suspend fun getIssue(issueId: String): Result<Issue> {
-        return issueApi.getIssue(issueId).asResult()
+        var page = 1
+        var result: Result<List<Issue>>
+        var issues: List<Issue>
+
+        do {
+            result = getIssues(
+                offset = (page - 1) * PAGING_PAGE_SIZE,
+                type = IssueType.None,
+                status = IssueStatus.None,
+                sortType = SortType.ASC,
+            ) as? Result.Success ?: break
+
+            issues = result.data()
+            issues.firstOrNull {
+                it.id == issueId
+            }?.let {
+                return Result.success(it)
+            }
+            page++
+        } while (issues.isNotEmpty())
+
+        return Result.fail("Failed to get issue")
     }
 
     override suspend fun updateIssue(
@@ -44,7 +66,7 @@ class RemoteIssueDataSource(
         issueId: String,
         text: String
     ): Result<Unit> {
-        return issueApi.createCommentForIssue(header, issueId, text).asResult()
+        return issueApi.createCommentForIssue(header, issueId, RawComment(text)).asResult()
     }
 
     override suspend fun addLabelToIssue(
@@ -57,5 +79,13 @@ class RemoteIssueDataSource(
 
     override suspend fun removeLabelOfIssue(header: String, issueId: String): Result<Unit> {
         return issueApi.removeLabelOfIssue(header, issueId).asResult()
+    }
+
+    override suspend fun vote(header: String, issueId: String, vote: RawVote): Result<Unit> {
+        val createResult = issueApi.vote(header, issueId, vote)
+        if (createResult.code() == 400) {
+            return issueApi.updateVote(header, issueId, vote).asResult()
+        }
+        return createResult.asResult()
     }
 }

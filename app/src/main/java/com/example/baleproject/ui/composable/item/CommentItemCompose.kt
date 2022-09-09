@@ -90,11 +90,7 @@ fun ShimmerCommentItemCompose() {
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                BoxShimmer(width = 100.dp, height = 20.dp)
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                BoxShimmer(width = 40.dp, height = 20.dp)
+                BoxShimmer(width = 200.dp, height = 20.dp)
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -108,7 +104,7 @@ fun ShimmerCommentItemCompose() {
 
             Spacer(modifier = Modifier.height(3.dp))
 
-            BoxShimmer(height = 20.dp)
+            BoxShimmer(height = 20.dp, width = 300.dp)
         }
     }
 }
@@ -120,7 +116,7 @@ fun Preview() {
         id = "12",
         userId = "user23",
         text = "Funny Tik Toks that will make you laugh, The funniest TikTok compilations with Tik Toks Mashups 2020/2021/2022. Other Tik Tok channels making quality, TikTok Charts, Visicks, Azure, Wifi Plug, Monstro, and TikHQ. Making the best Tik Tok compilations. ",
-        date = System.currentTimeMillis() / 1000
+        date = "System.currentTimeMillis() / 1000"
     )
     CommentItemCompose(comment)
 }

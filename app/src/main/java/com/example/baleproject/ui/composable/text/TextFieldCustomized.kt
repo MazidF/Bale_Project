@@ -17,8 +17,8 @@ import com.example.baleproject.ui.theme.blue
 @Composable
 fun TextFieldCustomized(
     value: String,
-    hint: String,
     modifier: Modifier = Modifier,
+    hint: String? = null,
     color: Color = blue,
     readOnly: Boolean = false,
     isEnable: Boolean = true,
@@ -44,14 +44,8 @@ fun TextFieldCustomized(
             focusedBorderColor = color,
             focusedLabelColor = color,
         ),
-        placeholder = {
-            Text(text = hint, color = Color.Gray)
-        },
-        label = {
-            label?.let {
-                Text(text = hint, color = blue)
-            }
-        },
+        label = composableFun(label, blue),
+        placeholder = composableFun(hint, Color.Gray),
         trailingIcon = trailingIcon,
         visualTransformation = visualTransformation,
         shape = RoundedCornerShape(10.dp),
@@ -63,8 +57,8 @@ fun TextFieldCustomized(
 @Composable
 fun TextFieldCustomized(
     state: TextFieldCustomizedState,
-    hint: String,
     modifier: Modifier = Modifier,
+    hint: String? = null,
     color: Color = blue,
     label: String? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -86,6 +80,13 @@ fun TextFieldCustomized(
     )
 }
 
+private fun composableFun(text: String?, color: Color): @Composable (() -> Unit)? {
+    return text?.let {
+        {
+            Text(text = text, color = color)
+        }
+    }
+}
 
 data class TextFieldCustomizedState(
     val value: String,

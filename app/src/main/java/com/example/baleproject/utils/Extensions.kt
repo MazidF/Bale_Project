@@ -50,16 +50,16 @@ fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit): Job {
     return viewModelScope.launch(block = block)
 }
 
-fun getDetailRouteByIssue(issueItem: IssueItem): String {
-    return "${Destinations.Detail.name}/${issueItem.id}"
-}
-
 fun CombinedLoadStates.isRefreshing(): Boolean {
     return this.refresh == LoadState.Loading
 }
 
 fun CombinedLoadStates.isAppending(): Boolean {
     return this.append == LoadState.Loading
+}
+
+fun CombinedLoadStates.failed(): Boolean {
+    return this.append is LoadState.Error
 }
 
 fun logger(msg: String, tag: String = "logger") {

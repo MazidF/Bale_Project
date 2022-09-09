@@ -18,6 +18,10 @@ sealed class Vote(
         downVoteCount: Int,
     ) : Vote(upVoteCount, downVoteCount, Color.Red)
 
+    fun vote(): Int {
+        return upVoteCount - downVoteCount
+    }
+
     companion object {
         fun get(name: String, upVoteCount: Int, downVoteCount: Int): Vote {
             return when (name) {
@@ -28,6 +32,14 @@ sealed class Vote(
                     Down(upVoteCount, downVoteCount)
                 }
                 else -> throw IllegalStateException("Unknown vote")
+            }
+        }
+
+        fun get(upVoteCount: Int, downVoteCount: Int): Vote {
+            return if (upVoteCount < downVoteCount) {
+                Down(upVoteCount, downVoteCount)
+            } else {
+                Up(upVoteCount, downVoteCount)
             }
         }
     }

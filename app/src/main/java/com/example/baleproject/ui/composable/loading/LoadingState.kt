@@ -2,6 +2,8 @@ package com.example.baleproject.ui.composable.loading
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,18 +18,20 @@ import com.example.baleproject.utils.isRefreshing
 fun <T : Any> PagingLoadingState(
     lazyPagingItems: LazyPagingItems<T>,
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     context: LazyListScope.() -> Unit,
 ) {
-    val state = lazyPagingItems.loadState
+    val loadStates = lazyPagingItems.loadState
 
-    if (state.isRefreshing()) {
+    if (loadStates.isRefreshing()) {
         LottieAnimationCustomized(id = R.raw.three_dot_loading)
     } else {
         LazyColumn(
             modifier = modifier,
+            state = state,
         ) {
             context()
-            if (state.isAppending()) {
+            if (loadStates.isAppending()) {
                 item {
                     AppendingLoading()
                 }
