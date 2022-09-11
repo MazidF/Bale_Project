@@ -7,9 +7,10 @@ interface IssueDataSource {
 
     suspend fun getIssues(
         offset: Int,
-        type: IssueType,
-        status: IssueStatus,
-        sortType: SortType,
+        type: IssueType? = null,
+        status: IssueStatus? = null,
+        sortType: SortType? = null,
+        sortBy: SortBy? = null,
     ): Result<List<Issue>>
 
     suspend fun createIssue(

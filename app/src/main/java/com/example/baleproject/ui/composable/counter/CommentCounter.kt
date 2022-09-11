@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.baleproject.R
-import com.example.baleproject.ui.composable.color.surfaceColor
 
 @Composable
 fun CommentCounter(count: Int) {
@@ -22,7 +21,7 @@ fun CommentCounter(count: Int) {
         Row {
             Image(
                 painter = painterResource(id = R.drawable.ic_comment),
-                colorFilter = ColorFilter.tint(surfaceColor()),
+                colorFilter = ColorFilter.tint(Color.Gray),
                 modifier = Modifier.alpha(.7f),
                 contentDescription = null
             )

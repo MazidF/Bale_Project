@@ -25,4 +25,5 @@
     <string name="filter">Filter</string>
     <string name="comment">Comment</string>
     <string name="create">Create</string>
+    <string name="apply">Apply</string>
 </resources>

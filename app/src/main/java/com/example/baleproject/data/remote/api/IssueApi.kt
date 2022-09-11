@@ -13,7 +13,7 @@ interface IssueApi {
         @Query("type") type: String? = null,
         @Query("status") status: String? = null,
         @Query("sortType") sortType: String? = null,
-        @Query("sortBy") sortBy: String = "Date",
+        @Query("sortBy") sortBy: String? = null,
     ): Response<List<Issue>>
 
     @POST("issues")

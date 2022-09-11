@@ -11,11 +11,12 @@ class IssueRepository(
 ) {
     suspend fun getIssues(
         offset: Int,
-        type: IssueType,
-        status: IssueStatus,
-        sortType: SortType,
+        type: IssueType?,
+        status: IssueStatus?,
+        sortType: SortType?,
+        sortBy: SortBy?,
     ): Result<List<Issue>> {
-        return dataSource.getIssues(offset, type, status, sortType)
+        return dataSource.getIssues(offset, type, status, sortType, sortBy)
     }
 
     suspend fun createIssue(

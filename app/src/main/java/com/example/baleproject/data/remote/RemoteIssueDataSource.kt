@@ -13,11 +13,13 @@ class RemoteIssueDataSource(
 
     override suspend fun getIssues(
         offset: Int,
-        type: IssueType,
-        status: IssueStatus,
-        sortType: SortType
+        type: IssueType?,
+        status: IssueStatus?,
+        sortType: SortType?,
+        sortBy: SortBy?
     ): Result<List<Issue>> {
-        return issueApi.getIssues(offset, type.query, status.query, sortType.query).asResult()
+        return issueApi.getIssues(offset, type?.name, status?.name, sortType?.name, sortBy?.name)
+            .asResult()
     }
 
     override suspend fun createIssue(header: String, issue: RawIssue): Result<Unit> {
@@ -32,8 +34,6 @@ class RemoteIssueDataSource(
         do {
             result = getIssues(
                 offset = (page - 1) * PAGING_PAGE_SIZE,
-                type = IssueType.None,
-                status = IssueStatus.None,
                 sortType = SortType.ASC,
             ) as? Result.Success ?: break
 

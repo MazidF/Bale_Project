@@ -1,14 +1,14 @@
 package com.example.baleproject.data.model
 
-enum class SortType {
-    ASC,
-    DESC;
+enum class SortBy {
+    DATE,
+    VOTES;
 
     companion object {
-        fun get(name: String): SortType {
+        fun get(name: String): SortBy {
             return values().firstOrNull {
                 it.name == name
-            } ?: throw IllegalStateException("Unknown SortType")
+            } ?: throw IllegalStateException("Unknown SortBy")
         }
     }
 }

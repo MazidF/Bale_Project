@@ -62,9 +62,10 @@ class UseCase(
     }
 
     fun loadIssues(
-        status: IssueStatus,
-        type: IssueType = IssueType.None,
-        sortType: SortType = SortType.ASC,
+        status: IssueStatus?,
+        type: IssueType?,
+        sortBy: SortBy?,
+        sortType: SortType?,
         pagingConfig: PagingConfig = this.pagingConfig,
     ): Flow<PagingData<Issue>> {
         return ItemPagingSource.pager(
@@ -79,6 +80,7 @@ class UseCase(
                         status = status,
                         type = type,
                         sortType = sortType,
+                        sortBy = sortBy,
                     )
                 }
             }

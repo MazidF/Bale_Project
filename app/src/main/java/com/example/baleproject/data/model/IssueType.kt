@@ -1,15 +1,17 @@
 package com.example.baleproject.data.model
 
-enum class IssueType(
-    val query: String?,
-) {
-    Bug("Bug"),
-    Suggestion("Suggestion"),
-    None(null);
+import androidx.compose.runtime.Stable
 
-    fun get(name: String): IssueType {
-        return values().firstOrNull {
-            it.name == name
-        } ?: throw IllegalStateException("Unknown Issue")
+@Stable
+enum class IssueType {
+    Bug,
+    Suggestion;
+
+    companion object {
+        fun get(name: String): IssueType {
+            return values().firstOrNull {
+                it.name == name
+            } ?: throw IllegalStateException("Unknown Issue")
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.baleproject.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
@@ -13,8 +14,9 @@ private val DarkColorPalette = darkColors(
     onSurface = Color.White,
 )
 
+@SuppressLint("ConflictingOnColor")
 private val LightColorPalette = lightColors(
-    background = Color(0xFFF2F2F2),
+    background = Color(0xFFD8D7D7),
     surface = Color.White,
     onSurface = Color.Black,
 
