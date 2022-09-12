@@ -1,8 +1,6 @@
 package com.example.baleproject.ui.navigation
 
 import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 
 enum class Destinations(
     val route: String,
@@ -17,12 +15,8 @@ enum class Destinations(
         arguments = emptyList(),
     ),
     Detail(
-        route = "Detail/{issueId}",
-        arguments = listOf(
-            navArgument("issueId") {
-                type = NavType.StringType
-            },
-        ),
+        route = "Detail",
+        arguments = listOf(),
     ),
     Feedback(
         route = "Feedback",
@@ -34,5 +28,12 @@ enum class Destinations(
     ) {
         Login("Login"),
         Signup("Signup");
+    }
+
+    enum class ProfilePack(
+        val route: String,
+    ) {
+        Profile("Profile"),
+        Edit("Edit");
     }
 }
