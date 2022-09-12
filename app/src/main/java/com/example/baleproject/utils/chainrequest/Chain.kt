@@ -10,7 +10,7 @@ class Chain<I : Any, StartInput : Any> private constructor(
 ) {
     private var next: Chain<*, StartInput>? = firstBuilder
 
-    fun <O : Any> add(request: ChainRequest<I, O>): Chain<O, StartInput> {
+    fun <O : Any> then(request: ChainRequest<I, O>): Chain<O, StartInput> {
         return Chain(request, next ?: this).also {
             next = it
         }
@@ -38,5 +38,13 @@ class Chain<I : Any, StartInput : Any> private constructor(
                 Result.fail<I>(e)
             }
         } as Result<I>
+    }
+
+    companion object {
+        fun <I : Any, StartInput : Any> start(
+            request: ChainRequest<StartInput, I>,
+        ): Chain<I, StartInput> {
+            return Chain(request, firstBuilder = null)
+        }
     }
 }

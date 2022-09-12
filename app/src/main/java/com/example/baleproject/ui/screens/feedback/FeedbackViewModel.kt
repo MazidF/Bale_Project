@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.baleproject.data.model.IssueType
 import com.example.baleproject.data.result.Result
 import com.example.baleproject.domain.UseCase
+import com.example.baleproject.ui.model.LabelItem
 import com.example.baleproject.utils.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,9 +21,24 @@ class FeedbackViewModel @Inject constructor(
     var title by mutableStateOf("")
     var description by mutableStateOf("")
     var issueType by mutableStateOf(IssueType.Bug)
+    var labels by mutableStateOf<List<LabelItem>>(emptyList())
+        private set
 
     private val _postResult = MutableStateFlow<Result<*>?>(null)
     val postResult get() = _postResult.asStateFlow()
+
+    private val _labels = MutableStateFlow<HashMap<String, LabelItem>>(hashMapOf())
+    val label = _labels.asStateFlow()
+
+    init {
+        loadLabels()
+    }
+
+    private fun loadLabels() {
+        launch {
+            _labels.emit(useCase.getLabels())
+        }
+    }
 
     fun userName(): String {
         return useCase.getUserName()
@@ -32,21 +48,23 @@ class FeedbackViewModel @Inject constructor(
         return description.isBlank() or (description.length >= 40)
     }
 
-    fun typeChecker(): Boolean {
-        return issueType != IssueType.None
-    }
-
     fun post() {
         launch {
+            _postResult.emit(Result.loading<Unit>())
+            val ids = useCase.createLabels(labels)
             val flow = useCase.createIssue(
                 title = title,
                 description = description,
                 type = issueType,
-                labelIds = listOf(),
+                labelIds = ids,
             )
             flow.collect {
                 _postResult.emit(it)
             }
         }
+    }
+
+    fun addLabel(label: LabelItem) {
+        labels = labels + listOf(label)
     }
 }

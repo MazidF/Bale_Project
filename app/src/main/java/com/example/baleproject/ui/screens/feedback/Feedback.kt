@@ -3,6 +3,7 @@ package com.example.baleproject.ui.screens.feedback
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -10,20 +11,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.baleproject.R
+import com.example.baleproject.data.model.IssueType
 import com.example.baleproject.data.result.Result
 import com.example.baleproject.ui.composable.button.BackButton
 import com.example.baleproject.ui.composable.button.ClearButton
 import com.example.baleproject.ui.composable.button.LoadingButton
+import com.example.baleproject.ui.composable.item.LabelItemCompose
+import com.example.baleproject.ui.composable.tapbor.TabItem
+import com.example.baleproject.ui.composable.tapbor.TabLayout
 import com.example.baleproject.ui.composable.text.DescriptionText
 import com.example.baleproject.ui.composable.text.TextFieldCustomized
 import com.example.baleproject.ui.composable.text.TextFieldCustomizedState
 import com.example.baleproject.ui.composable.text.TitleText
 import com.example.baleproject.ui.composable.text.keybaordaction.NextKeyboardAction
-import com.example.baleproject.ui.composable.wrapper.CurveColumn
+import com.example.baleproject.ui.composable.utils.LabelMaker
+import com.example.baleproject.ui.composable.wrapper.CurveLazyColumn
+import com.example.baleproject.ui.model.LabelItem
+import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
 fun Feedback(events: FeedbackEvents) {
@@ -39,6 +48,7 @@ fun FeedbackState(
 
     val result = viewModel.postResult.collectAsState()
     val isLoading by remember { mutableStateOf(result.value is Result.Loading) }
+    val issueType = remember { viewModel.issueType }
 
     LaunchedEffect(result.value is Result.Success) {
         (result.value as? Result.Success)?.let {
@@ -65,6 +75,10 @@ fun FeedbackState(
         descriptionState = descriptionState,
         descriptionFocusReq = descriptionFocusReq,
         focusOnDescription = { descriptionFocusReq.requestFocus() },
+        initialIssueType = issueType,
+        onIssueTypeChanged = { viewModel.issueType = IssueType.values()[it] },
+        labels = viewModel.labels,
+        onAddLabel = { viewModel.addLabel(it) },
         isLoading = isLoading,
         onPostClicked = { viewModel.post() },
         onBackPress = events::back,
@@ -78,44 +92,106 @@ fun FeedbackContent(
     descriptionState: TextFieldCustomizedState,
     descriptionFocusReq: FocusRequester,
     focusOnDescription: KeyboardActionScope.() -> Unit,
+    initialIssueType: IssueType,
+    onIssueTypeChanged: (Int) -> Unit,
+    labels: List<LabelItem>,
+    onAddLabel: (LabelItem) -> Unit,
     isLoading: Boolean,
     onPostClicked: () -> Unit,
     onBackPress: () -> Unit,
 ) {
     BackButton(isEnable = isLoading.not(), onBackPressed = onBackPress)
 
-    CurveColumn {
-        TitleText(
-            text = stringResource(id = R.string.feedback_maker_title),
-            fontSize = 19.sp,
-        )
+    CurveLazyColumn {
+        item(1) {
+            TitleText(
+                text = stringResource(id = R.string.feedback_maker_title),
+                fontSize = 19.sp,
+            )
+        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        SpacerItem(20.dp)
 
-        UsernameField(userName)
+        item(2) {
+            val type by remember { mutableStateOf(initialIssueType) }
+            TypeField(type, onIssueTypeChanged)
+        }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        SpacerItem(20.dp)
 
-        TitleField(
-            titleState, focusOnDescription
-        )
+        item(3) {
+            UsernameField(userName)
+        }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        SpacerItem(15.dp)
 
-        DescriptionField(
-            descriptionState, descriptionFocusReq
-        )
+        item(4) {
+            TitleField(
+                titleState, focusOnDescription
+            )
+        }
 
-        Spacer(modifier = Modifier.height(40.dp))
+        SpacerItem(15.dp)
 
-        PostButton(
-            isLoading = isLoading,
-            isEnable = titleState.value.isNotBlank()
-                    and descriptionState.value.isNotBlank()
-                    and descriptionState.hasError.not(),
-            onPostClicked = onPostClicked,
-        )
+        item(5) {
+            DescriptionField(
+                descriptionState, descriptionFocusReq
+            )
+        }
+
+        item(6) {
+            LabelMaker(isLoading = false, onClick = onAddLabel)
+        }
+
+        SpacerItem(5.dp)
+
+        item(7) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                labels.forEach {
+                    LabelItemCompose(label = it)
+                }
+            }
+        }
+
+        SpacerItem(40.dp)
+
+        item(8) {
+            PostButton(
+                isLoading = isLoading,
+                isEnable = titleState.value.isNotBlank()
+                        and descriptionState.value.isNotBlank()
+                        and descriptionState.hasError.not(),
+                onPostClicked = onPostClicked,
+            )
+        }
     }
+}
+
+private fun LazyListScope.SpacerItem(size: Dp) {
+    item {
+        Spacer(modifier = Modifier.height(size))
+    }
+}
+
+@Composable
+private fun TypeField(
+    initialIssueType: IssueType,
+    onIssueTypeChanged: (Int) -> Unit
+) {
+    TabLayout(
+        initialSelectedIndex = initialIssueType.ordinal,
+        tabs = listOf(
+            TabItem(
+                title = "Bug", icon = R.drawable.ic_bug,
+            ),
+            TabItem(
+                title = "Suggestion", icon = R.drawable.ic_suggestion,
+            )
+        ),
+        onTabIndexChanged = onIssueTypeChanged,
+    )
 }
 
 @Composable

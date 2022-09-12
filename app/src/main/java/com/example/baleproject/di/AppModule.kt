@@ -42,9 +42,11 @@ class AppModule {
     @Singleton
     fun provideLabelDataSource(
         labelApi: LabelApi,
+        @IO dispatcher: CoroutineDispatcher,
     ): LabelDataSource {
         return RemoteLabelDataSource(
             labelApi = labelApi,
+            dispatcher = dispatcher,
         )
     }
 

@@ -158,13 +158,16 @@ class UseCase(
         }
     }
 
-    suspend fun autoLogin(): Result<Unit> {
-        val (email, password) = getEmailAndPassword(context) ?: return Result.success(Unit)
-        val user = LoginUser(
-            email = email,
-            password = password,
-        )
-        return userRepository.login(user).map {}
+    suspend fun autoLogin(): Flow<Result<Unit>> {
+        return safeApiCall {
+            val (email, password) = getEmailAndPassword(context)
+                ?: return@safeApiCall Result.success(Unit)
+            val user = LoginUser(
+                email = email,
+                password = password,
+            )
+            userRepository.login(user).map {}
+        }
     }
 
     private fun saveUserInfo(result: Result<UserInfo>) {
@@ -260,6 +263,10 @@ class UseCase(
         }
     }
 
+    suspend fun createLabels(labels: List<LabelItem>): List<String> {
+        return labelRepository.createLabels(userInfo!!.cookie, labels).map(LabelId::id)
+    }
+
     private fun <T> safeApiCall(
         emitLoading: Boolean = true,
         block: suspend () -> Result<T>,
@@ -271,6 +278,7 @@ class UseCase(
                 emit(Result.loading())
             }
         }.catch { cause ->
+            logger(cause.message.toString())
             emit(Result.fail(cause))
         }.flowOn(dispatcher)
     }

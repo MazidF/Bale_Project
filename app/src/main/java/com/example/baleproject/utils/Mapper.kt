@@ -1,10 +1,8 @@
 package com.example.baleproject.utils
 
 import androidx.compose.ui.graphics.Color
-import com.example.baleproject.data.model.Issue
-import com.example.baleproject.data.model.Label
-import com.example.baleproject.data.model.User
-import com.example.baleproject.data.model.UserInfo
+import androidx.compose.ui.graphics.toArgb
+import com.example.baleproject.data.model.*
 import com.example.baleproject.ui.model.IssueItem
 import com.example.baleproject.ui.model.LabelItem
 
@@ -35,4 +33,8 @@ fun UserInfo.toUser(): User {
         email = email,
         verified = verified,
     )
+}
+
+fun LabelItem.toRawLabel(): RawLabel {
+    return RawLabel(name, color.toArgb())
 }
