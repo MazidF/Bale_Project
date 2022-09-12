@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 
-@Composable
+/*@Composable
 fun FlowLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -16,9 +16,9 @@ fun FlowLayout(
         modifier = modifier,
         content = content,
     )
-}
+}*/
 
-private fun flowLayoutMeasurePolicy() = MeasurePolicy { measurables, constraints ->
+/*private fun flowLayoutMeasurePolicy() = MeasurePolicy { measurables, constraints ->
     layout(constraints.maxWidth, constraints.maxHeight) {
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints)
@@ -44,4 +44,4 @@ private fun flowLayoutMeasurePolicy() = MeasurePolicy { measurables, constraints
             }
         }
     }
-}
+}*/
