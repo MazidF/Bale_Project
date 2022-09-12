@@ -19,7 +19,7 @@ class UserRepository(
     suspend fun updateUser(
         header: String,
         userId: String,
-        user: User,
+        user: RawUser,
     ): Result<User> {
         return dataSource.updateUser(header, userId, user)
     }

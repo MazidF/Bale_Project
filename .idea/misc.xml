@@ -4,8 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_add.xml" value="0.1" />
+        <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_bug.xml" value="0.196" />
         <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_down.xml" value="0.1" />
+        <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_edit.xml" value="0.1" />
+        <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_filter.xml" value="0.1" />
+        <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_logout.xml" value="0.1" />
+        <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_sort.xml" value="0.1795" />
+        <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable-anydpi/ic_suggestion.xml" value="0.196" />
         <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/drawable/ic_comment.xml" value="0.1" />
+        <entry key="..\:/Users/vcc/AndroidStudioProjects/BaleProject/app/src/main/res/layout/asddfsa.xml" value="0.1" />
       </map>
     </option>
   </component>

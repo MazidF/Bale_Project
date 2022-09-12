@@ -15,7 +15,7 @@ interface UserApi {
     suspend fun updateUser(
         @Header(ACCESS_TOKEN_KEY) header: String,
         @Path("userId") userId: String,
-        @Body user: User,
+        @Body user: RawUser,
     ): Response<User>
 
     @POST("users")

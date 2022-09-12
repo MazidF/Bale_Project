@@ -17,7 +17,7 @@ class RemoteUserDataSource(
         return userApi.getUser(userId).asResult()
     }
 
-    override suspend fun updateUser(header: String, userId: String, user: User): Result<User> {
+    override suspend fun updateUser(header: String, userId: String, user: RawUser): Result<User> {
         return userApi.updateUser(header, userId, user).asResult()
     }
 
@@ -44,13 +44,6 @@ class RemoteUserDataSource(
             this.copy(
                 cookie = accessToken.substring(0, index)
             )
-            /*UserInfo(
-                id = id,
-                name = name,
-                email = email,
-                verified = verified,
-                accessToken = accessToken,
-            )*/
         }
     }
 }

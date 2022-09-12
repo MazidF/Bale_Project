@@ -1,5 +1,8 @@
 package com.example.baleproject.data.model
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class UserInfo(
     val id: String,
     val name: String,

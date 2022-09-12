@@ -14,7 +14,6 @@ import com.example.baleproject.utils.*
 import com.example.baleproject.utils.helpers.ConnectionHelper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 
@@ -43,7 +42,6 @@ class UseCase(
     }
 
     private var labels: HashMap<String, LabelItem> = hashMapOf()
-    private var labelsJob: Job? = null
 
     init {
         initialSetup()
@@ -129,6 +127,14 @@ class UseCase(
         return true
     }
 
+    suspend fun getLabels(): HashMap<String, LabelItem> {
+        return if (updateLabels()) {
+            labels
+        } else {
+            hashMapOf()
+        }
+    }
+
     fun signup(name: String, email: String, password: String): Flow<Result<Unit>> {
         val user = SignupUser(
             name = name,
@@ -175,6 +181,14 @@ class UseCase(
         return userInfo!!.name
     }
 
+    fun getUserInfo(): UserInfo {
+        return userInfo!!
+    }
+
+    fun logout() {
+        userInfo = null
+    }
+
     suspend fun createIssue(
         title: String,
         description: String,
@@ -219,6 +233,30 @@ class UseCase(
     fun getIssue(issueId: String): Flow<Result<Issue>> {
         return safeApiCall {
             issueRepository.getIssue(issueId)
+        }
+    }
+
+    fun updateUserInfo(name: String, email: String): Flow<Result<User>> {
+        return safeApiCall {
+            userRepository.updateUser(
+                header = userInfo!!.cookie,
+                userId = userInfo!!.id,
+                user = RawUser(name, email)
+            ).also {
+                (it as? Result.Success)?.let { result ->
+                    saveUserInfo(
+                        result.map {
+                            UserInfo(
+                                id = id,
+                                name = name,
+                                email = email,
+                                verified = verified,
+                                cookie = userInfo!!.cookie,
+                            )
+                        }
+                    )
+                }
+            }
         }
     }
 

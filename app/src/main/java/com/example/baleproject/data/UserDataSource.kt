@@ -12,7 +12,7 @@ interface UserDataSource {
     suspend fun updateUser(
         header: String,
         userId: String,
-        user: User,
+        user: RawUser,
     ): Result<User>
 
     suspend fun createUser(
